@@ -1,0 +1,130 @@
+<!--index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoodMatch - Discover</title>
+  <link rel="stylesheet" href="style/frontpage.css">
+  <link rel="stylesheet" href="style/moodboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header class="nav-bar">
+    <h1 class="brand">MoodMatch</h1>
+    <nav>
+      <ul>
+        <li><a href="#" id="discoverBtn">Discover</a></li>
+        <li><a href="#social-sync">Social Sync</a></li>
+        <li><a href="userlogin.html">Sign In</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2><span>Your Emotions</span>, <span>Our Movies</span></h2>
+    <p>Let MoodMatch recommend the perfect movie or show for how you're feeling right now.</p>
+    <div class="search-bar">
+      <input type="text" id="searchBox" placeholder="Search by mood (e.g. happy, sad, etc.)">
+      <button onclick="searchByMood()">Search</button>
+    </div>
+  </section>
+  
+  <!-- Only one results section -->
+  <section id="results" class="movie-grid"></section>
+
+  <main class="mood-cards">
+    <div class="card feelgood" onclick="loadMood('happy')"><div class="emoji">😆</div><h3>Feel-Good Flicks</h3><p>Brighten your day with these uplifting stories</p></div>
+    <div class="card heartbreak" onclick="loadMood('sad')"><div class="emoji">💔</div><h3>Heartbreak Healers</h3><p>Movies that understand your pain and help you heal</p></div>
+    <div class="card adrenaline" onclick="loadMood('excited')"><div class="emoji">⚡</div><h3>Adrenaline Rush</h3><p>Get your pulse racing with these thrilling adventures</p></div>
+    <div class="card mindbender" onclick="loadMood('bored')"><div class="emoji">🧠</div><h3>Mind Benders</h3><p>Thought-provoking films that challenge your perception</p></div>
+    <div class="card laughter" onclick="loadMood('happy')"><div class="emoji">😂</div><h3>Laughter Therapy</h3><p>Comedies guaranteed to make you laugh out loud</p></div>
+    <div class="card nostalgic" onclick="loadMood('nostalgic')"><div class="emoji">⏳</div><h3>Nostalgic Journeys</h3><p>Take a trip down memory lane with these classics</p></div>
+  </main>
+
+  <section id="social-sync">
+    <h2>Social Sync</h2>
+    <div class="sync-grid">
+      <div class="sync-card">
+        <h4>@moviebuff91</h4>
+        <p>Just watched <strong>Everything Everywhere All at Once</strong> — 5⭐!</p>
+      </div>
+      <div class="sync-card">
+        <h4>@cinemalover</h4>
+        <p>Recommended <strong>Her</strong> under the mood <em>lonely</em></p>
+      </div>
+      <div class="sync-card">
+        <h4>@thrillseeker</h4>
+        <p>Loved <strong>Inception</strong> after selecting <em>mindbender</em></p>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Unified mood mapping (for reference, not used in code)
+    // const moodMap = {
+    //   happy: 'happy',
+    //   sad: 'sad',
+    //   excited: 'excited',
+    //   romantic: 'romantic',
+    //   scared: 'scared',
+    //   angry: 'angry',
+    //   adventurous: 'adventurous',
+    //   nostalgic: 'nostalgic',
+    //   bored: 'bored'
+    // };
+
+    function loadMood(mood) {
+      fetch(`/api/movies/search?query=${mood}`)
+        .then(res => res.json())
+        .then(data => displayMovies(data))
+        .catch(err => console.error(err));
+    }
+
+    function searchByMood() {
+      const mood = document.getElementById("searchBox").value.trim().toLowerCase();
+      if (!mood) return alert("Please enter a mood to search.");
+      fetch(`/api/movies/search?query=${mood}`)
+        .then(res => res.json())
+        .then(data => displayMovies(data))
+        .catch(err => console.error(err));
+    }
+
+    function displayMovies(movies) {
+      const results = document.getElementById("results");
+      results.innerHTML = "";
+      if (!movies || movies.length === 0) {
+        results.innerHTML = "<p style='color:white;text-align:center;'>No movies found.</p>";
+        return;
+      }
+      movies.forEach(movie => {
+        const card = document.createElement("div");
+        card.className = "movie-card";
+        const img = document.createElement("img");
+        img.src = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : 'https://via.placeholder.com/200x300?text=No+Image';
+        const title = document.createElement("h3");
+        title.textContent = movie.title;
+        card.appendChild(img);
+        card.appendChild(title);
+        results.appendChild(card);
+      });
+    }
+
+    new Chart(document.getElementById('moodChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Mood Count',
+          data: [3, 6, 2, 5, 4, 7, 3],
+          backgroundColor: ['#a78bfa', '#facc15', '#60a5fa', '#fb7185', '#10b981', '#f472b6', '#6366f1']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } }
+      }
+    });
+  </script>
+</body>
+</html>
