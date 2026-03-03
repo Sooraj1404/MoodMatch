@@ -40,3 +40,13 @@ MoodMatch/
 ├── frontend/
 ├── .gitignore
 └── README.md
+
+---
+
+## 📸 Application Preview
+
+### 🏠 Landing Page
+![Landing Page](frontend/screenshots/landing.png)
+
+### 🎭 User Dashboard
+![User Dashboard](frontend/screenshots/dashboard.png)
